@@ -1504,16 +1504,18 @@ function apply_playerbots_db
     fi
   done
 
-  echo "> Trying to apply playerbots sql mods for characters db..."
-  for UPDATEFILE in ${CORE_PATH}/src/modules/PlayerBots/sql/characters/*.sql; do
-    if [ -e "$UPDATEFILE" ]; then
-      local fName=$(basename "$UPDATEFILE")
-      if ! execute_sql_file "$CHAR_DB_NAME" "$UPDATEFILE" "  - Applying $fName"; then
-        false
-        return
+  if [ "$apply_full_content_only" != true ]; then
+    echo "> Trying to apply playerbots sql mods for characters db..."
+    for UPDATEFILE in ${CORE_PATH}/src/modules/PlayerBots/sql/characters/*.sql; do
+      if [ -e "$UPDATEFILE" ]; then
+        local fName=$(basename "$UPDATEFILE")
+        if ! execute_sql_file "$CHAR_DB_NAME" "$UPDATEFILE" "  - Applying $fName"; then
+          false
+          return
+        fi
       fi
-    fi
-  done
+    done
+  fi
 
   echo
   true
@@ -1661,6 +1663,14 @@ function apply_full_content_db()
     false
     return
   fi
+
+  # Apply playerbots
+  apply_full_content_only=true
+  if ! apply_playerbots_db; then
+    false
+    return
+  fi
+  unset apply_full_content_only
 
   # DEVELOPERS UPDATES
   if ! apply_dev_content; then
