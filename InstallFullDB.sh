@@ -1504,7 +1504,7 @@ function apply_playerbots_db
     fi
   done
 
-  if [ "$apply_full_content_only" != true ]; then
+  if [ -z "${apply_full_content_only+x}" ] || [ "$apply_full_content_only" != "true" ]; then
     echo "> Trying to apply playerbots sql mods for characters db..."
     for UPDATEFILE in ${CORE_PATH}/src/modules/PlayerBots/sql/characters/*.sql; do
       if [ -e "$UPDATEFILE" ]; then
